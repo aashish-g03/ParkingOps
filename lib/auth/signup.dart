@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:login_page/homePage1.dart';
+import 'package:login_page/home_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,14 +27,18 @@ class signupstate extends State<signup> {
     CollectionReference users = FirebaseFirestore.instance.collection('data');
     users.add(data);
   }*/
-
+  bool isValidEmail(String emailVal) {
+    return RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(emailVal);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
-          title: Text('CODE SHINOBIS',style: TextStyle(fontFamily: 'painter'))
+          // title: Text('CODE SHINOBIS',style: TextStyle(fontFamily: 'painter'))
         ),
         body: Padding(
             padding: EdgeInsets.all(10),
@@ -44,9 +48,9 @@ class signupstate extends State<signup> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      'Smart Parking System',
+                      'Parking Ops',
                       style: TextStyle(
-                            fontFamily: 'montserrat1',
+                          fontFamily: 'montserrat1',
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                           fontSize: 30),
@@ -68,14 +72,13 @@ class signupstate extends State<signup> {
                     ),
                   ),
                 ),
-
                 Container(
                   padding: EdgeInsets.all(10),
                   child: TextField(
                     controller: emailController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'User email',
+                      labelText: 'User Email',
                     ),
                   ),
                 ),
@@ -86,7 +89,7 @@ class signupstate extends State<signup> {
                     controller: passwordController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'New Password',
+                      labelText: 'Create Password',
                     ),
                   ),
                 ),
@@ -101,7 +104,7 @@ class signupstate extends State<signup> {
                     ),
                   ),
                 ),
-    /*Container(
+                /*Container(
     height: 70,
     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
     child: RaisedButton(
@@ -128,54 +131,41 @@ class signupstate extends State<signup> {
                     child: RaisedButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
-                          side: BorderSide(color: Colors.black)
-                      ),
+                          side: BorderSide(color: Colors.black)),
                       textColor: Colors.white,
                       color: Colors.black,
-                      child: Text('Sign Up', style: TextStyle(fontFamily: 'montserrat1')),
+                      child: Text('Sign Up',
+                          style: TextStyle(fontFamily: 'montserrat1')),
                       onPressed: () async {
-
-
-                        if(passwordController.text!='' && nameController.text!='' && emailController.text!='' && (passwordController.text==repasswordController.text))
-                        {
-
+                        if (passwordController.text != '' &&
+                            nameController.text != '' &&
+                            isValidEmail(emailController.text) &&
+                            (passwordController.text ==
+                                repasswordController.text)) {
                           try {
-                            UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text);
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .createUserWithEmailAndPassword(
+                                    email: emailController.text,
+                                    password: passwordController.text);
 
-                            /*CollectionReference users = FirebaseFirestore.instance.collection('users');
-                            users
-                                .add({
-                              'User name': nameController.text,
-                              'User email': emailController.text,
-                              'User Password': passwordController.text
-                            });*/
-
-
-                           /* firestoreInstance.collection("users").add(
-                                {
-                                  "User name" : nameController.text,
-                                  "User email" : emailController.text,
-                                  "User password" : passwordController.text
-                                }).then((value){
-                              print(value.id);
-                            }); */
-
-
-                            var firebaseUser =  FirebaseAuth.instance.currentUser; // this code is for setting the document id in firestore to the firebase auth userID
-                            firestoreInstance.collection("users").doc(firebaseUser.uid).set(
-                                {
-                                "User name" : nameController.text,
-                                "User email" : emailController.text,
-                                "User password" : passwordController.text
-
-                                }).then((_){
+                            var firebaseUser = FirebaseAuth.instance
+                                .currentUser; // this code is for setting the document id in firestore to the firebase auth userID
+                            firestoreInstance
+                                .collection("users")
+                                .doc(firebaseUser.uid)
+                                .set({
+                              "User name": nameController.text,
+                              "User email": emailController.text,
+                              "User password": passwordController.text,
+                            }).then((_) {
                               print(firebaseUser.uid);
                             });
 
-
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> homePage1()),
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()),
                             );
                             Fluttertoast.showToast(
                                 msg: "Sign up successsful!",
@@ -184,8 +174,7 @@ class signupstate extends State<signup> {
                                 timeInSecForIosWeb: 1,
                                 backgroundColor: Colors.blue,
                                 textColor: Colors.white,
-                                fontSize: 16.0
-                            );
+                                fontSize: 16.0);
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'weak-password') {
                               Fluttertoast.showToast(
@@ -195,34 +184,31 @@ class signupstate extends State<signup> {
                                   timeInSecForIosWeb: 1,
                                   backgroundColor: Colors.blue,
                                   textColor: Colors.white,
-                                  fontSize: 16.0
-                              );
+                                  fontSize: 16.0);
                             } else if (e.code == 'email-already-in-use') {
                               Fluttertoast.showToast(
-                                  msg: "An account already exists for this email!",
+                                  msg:
+                                      "An account already exists for this email!",
                                   toastLength: Toast.LENGTH_LONG,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIosWeb: 1,
                                   backgroundColor: Colors.blue,
                                   textColor: Colors.white,
-                                  fontSize: 16.0
-                              );
+                                  fontSize: 16.0);
                             }
                           } catch (e) {
                             print(e);
                           }
-
-                        }
-                        else {
+                        } else {
                           Fluttertoast.showToast(
-                              msg: "Please enter all the fields and the passwords correctly!",
+                              msg:
+                                  "Please enter all the fields and the passwords correctly!",
                               toastLength: Toast.LENGTH_LONG,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.blue,
                               textColor: Colors.white,
-                              fontSize: 16.0
-                          );
+                              fontSize: 16.0);
                         }
                         /*Map data;
 
@@ -234,13 +220,13 @@ class signupstate extends State<signup> {
                           CollectionReference users = FirebaseFirestore.instance.collection('users');
                           users.add(data);
                         }*/
-                      },// onPressed
+                      }, // onPressed
                     )),
-
               ],
             )));
   }
 }
+
 class AddUser extends StatelessWidget {
   final String fullName;
   final String company;
@@ -257,10 +243,10 @@ class AddUser extends StatelessWidget {
       // Call the user's CollectionReference to add a new user
       return users
           .add({
-        'full_name': fullName, // John Doe
-        'company': company, // Stokes and Sons
-        'age': age // 42
-      })
+            'full_name': fullName, // John Doe
+            'company': company, // Stokes and Sons
+            'age': age // 42
+          })
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
     }
